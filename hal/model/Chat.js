@@ -1,4 +1,4 @@
-import mongoose, { model } from 'mongoose'
+import mongoose from 'mongoose'
 
 const ChatSchema = new mongoose.Schema({
    userId:{
@@ -28,5 +28,5 @@ const ChatSchema = new mongoose.Schema({
    ],
 }, { timestamps: true });
 
-const Chat = mongoose.model('contact', ChatSchema);
+const Chat = mongoose.model('chat', ChatSchema);
 export default Chat;
