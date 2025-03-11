@@ -1,6 +1,21 @@
-import React, { useEffect } from 'react'
 
+import React, { useEffect } from 'react'
+import {useAuth} from '@clerk/clerk-react'
 export function DashBoardPage(props) {
+    const {userId} =useAuth()
+    const handleSubmit=async(e)=>{
+       e.preventDefault();
+       const text=e.target.text.value;
+       if (!text) return;
+
+       await fetch("http://localhost:5173/api/chat",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({userId,text})
+       })
+    }
     
     return (
        <div className="flex flex-col items-center justify-center gap-55">
@@ -25,8 +40,8 @@ export function DashBoardPage(props) {
             </div>
         </div>
         <div className="flex mt-auto w-[50%] sticky">
-            <form className='flex relative items-center justify-center w-[100%] h-[100%] gap-2 mb-9'>
-                <input type="text" className='!py-3 w-[100%] outline-none !px-2 border rounded-full' placeholder='ask me anything...' />
+            <form className='flex relative items-center justify-center w-[100%] h-[100%] gap-2 mb-9' onSubmit={handleSubmit}>
+                <input type="text" name='text' className='!py-3 w-[100%] outline-none !px-2 border rounded-full' placeholder='ask me anything...' />
                 <button className='right-2 absolute flex items-center justify-center cursor-pointer'>
                     <img src="/arrow.png" className='w-[30px] h-[30px] bg-white rounded-full' alt="" />
                 </button>
