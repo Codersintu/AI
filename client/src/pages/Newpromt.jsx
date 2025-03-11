@@ -1,19 +1,49 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Upload } from '../Upload';
 import { IKImage } from 'imagekitio-react';
+import model from '../Gemini/gemini';
+import Markdown from 'react-markdown'
 
 export function Newpromt(props) {
+    const [question,setQuestion]=useState("");
+    const [answer,setAnswer]=useState("");
     const endRef=useRef(null)
     const [img,setImg]=useState({
         isLoading:false,
         error:"",
-        dbData:{}
+        dbData:{},
+        aiData:{}
     })
     useEffect(()=>{
         endRef.current.scrollIntoView({behavior:"smooth"})
-    },[])
+    },[question,answer,img.dbData])
+    
+    const add=async(text)=>{
+        setQuestion(text)
+    const prompt = "Explain how AI works";
+
+    const result = await model.generateContent(Object.entries(img.aiData).length ? [img.aiData,text] : [text]);
+    const response=await result.response;
+    setAnswer(response.text())
+    setImg({
+        isLoading:false,
+        error:"",
+        dbData:{},
+        aiData:{}
+    })
+    console.log(result.response.text());
+    }
+
+    const handleSubmit=async(e)=>{
+        e.preventDefault();
+        const text=e.target.text.value;
+        if (!text) return;
+        add(text)
+    }
+   
     return (
         <>
+        {img.isLoading && <div className=''>Loading...</div>}
         {img.dbData?.filePath && (
            <IKImage
            urlEndpoint={import.meta.env.VITE_IMG_URLendpoint}
@@ -23,12 +53,15 @@ export function Newpromt(props) {
            transformation={[{width:380},{height:380}]}
            />
         )}
+        {question && <div className='message from user'>{question}</div>}
+        {answer && <div className='message from AI'><Markdown>{answer}</Markdown></div>}
         <div className="!pb-[100px]" ref={endRef}></div>
-        <form className="flex items-center justify-center border !py-2 gap-4 absolute bottom-4 w-[50%] bg-gray-700 p-3 rounded-xl">
+        <form onSubmit={handleSubmit} className="flex items-center justify-center border !py-2 gap-4 absolute bottom-4 w-[50%] bg-gray-700 p-3 rounded-xl">
             <Upload setImg={setImg}/>
-            <input type="file" name="file" id="file" hidden />
+            <input type="file" name="file" id="file" multiple={false} hidden />
             <input
                 type="text"
+                name='text'
                 className=" text-[#ececec] outline-none w-full !px-3 rounded-full"
                 placeholder="Ask me anything..."
             />

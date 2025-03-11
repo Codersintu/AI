@@ -5,7 +5,7 @@ export function ChatList(props) {
     
 
     return (
-        <div className="flex flex-col justify-between h-screen w-[300px] !py-8 gap-4">
+        <div className="flex flex-col justify-between h-[72%] w-[300px] !py-8 gap-4">
             <span className='font-semibold text-xl'>Dashboard</span>
             <Link to="/">Create a new chart</Link>
             <Link to="/">Explore Sintu AI</Link>
