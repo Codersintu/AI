@@ -19,7 +19,7 @@ export function DashBoardLayOut(props) {
     return (
         <div className="flex">
         <div className="flex-1"><ChatList/></div>
-        <div className="flex-4"><Outlet/></div>
-    </div> 
+        <div className="flex-4 "><Outlet/></div>
+     </div> 
     )
 }

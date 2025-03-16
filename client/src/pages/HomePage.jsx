@@ -6,8 +6,14 @@ export function HomePage(props) {
     const [typingImg,setTypingImg] =useState("Human")
     const navigate=useNavigate()
 
+    const text=async()=>{
+      await fetch("http://localhost:3001/api/text",{
+        credentials:'include'
+      })
+    }
+
     return (
-      <div className="flex flex-col items-center justify-center h-[100vh]">
+      <div className="flex flex-col items-center justify-center h-[90vh] ">
         <div className="flex items-center justify-center h-[100%] gap-48 homepage">
             <img className='bottom-0 left-0 opacity-[0.06] absolute animate-rotateOrbital' src="/orbital.png" alt="bg-img" />
           <div className="flex flex-1 flex-col items-center justify-center gap-7 z-10">
@@ -15,6 +21,7 @@ export function HomePage(props) {
             <h2 className='font-semibold'>This is AI to helpful for everyOne</h2>
             <h3 className='text-center text-cyan-300 '>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis dolorem eos eius veniam. Facere, aut?</h3>
             <button className='bg-blue-600 !py-2 !px-4 rounded-4xl cursor-pointer font-semibold hover:bg-cyan-500' onClick={()=>navigate("/dashboard")}>Get Started</button>
+            <button onClick={text}>text</button>
           </div>  
           <div className="flex-1 flex items-center justify-center h-[100%]">
             <div className="flex items-center justify-center bg-[#140e2d] w-[90%] h-[60%] rounded-[50px] relative">

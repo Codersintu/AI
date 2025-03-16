@@ -5,12 +5,17 @@ import ImageKit from 'imagekit';
 import mongoose from 'mongoose';
 import Chats from './model/chat.js';
 import UserChat from './model/Userchat.js';
+
 dotenv.config()
 
 const app=express();
+app.use(express.json());
 app.use(cors({
     origin:process.env.CLIENT_URL,
+    credentials:true,
+    allowedHeaders: ["Content-Type", "Authorization"]
 }))
+
 
 async function connect(params) {
     try {
@@ -32,55 +37,69 @@ app.get('/api/upload',(req,res)=>{
     res.send(result);
 })
 
-app.post('/api/chat',async(req,res)=>{
-    const {userId,text}=req.body;
+app.get("/api/text", (req, res) => {
+    console.log("Authenticated user:", req.auth);
+    res.send("Success");
+});
+
+// FIXED: `/api/chat` Route
+app.post("/api/chats", async (req, res) => {
+    const userId = req.auth.userId;
+    const { text } = req.body;
+  
     try {
-        const Newchat=new Chats({
-            userId:userId,
-            History:[{role:"user",parts:[{text}]}],
-        })
-        const savedChat=await Newchat.save();
-
-
-        //find already chat exist
-        const userChats=await UserChat.find({userId:userId});
-
-
-        //if userchat is not exist we can create
-        if (!userChats.length) {
-            const newUserchats=new UserChat({
-                userId:userId,
-                chats:[
-                    {
-                        _id:savedChat.id,
-                        title:text.substring(0,40),
-                    },
-                ],
-            })
-            await newUserchats.save();
-        }else{
-           await UserChat.updateOne({userId:userId},{
-            $push:{
-                chats:[
-                    {
-                        _id:savedChat.id,
-                        title:text.substring(0,40),
-                    }
-                ]
-            }
-            
-           })
-           return res.status(201).json(Newchat._id)
-        }
-    
-
-    } catch (error) {
-        return res.status(500).json({
-            success:false,
-            error
-        })
+      // CREATE A NEW CHAT
+      const newChat = new Chats({
+        userId: userId,
+        history: [{ role: "user", parts: [{ text }] }],
+      });
+  
+      const savedChat = await newChat.save();
+  
+      // CHECK IF THE USERCHATS EXISTS
+      const userChats = await UserChat.find({ userId: userId });
+  
+      // IF DOESN'T EXIST CREATE A NEW ONE AND ADD THE CHAT IN THE CHATS ARRAY
+      if (!userChats.length) {
+        const newUserChats = new UserChat({
+          userId: userId,
+          chats: [
+            {
+              _id: savedChat._id,
+              title: text.substring(0, 40),
+            },
+          ],
+        });
+  
+        await newUserChats.save();
+      } else {
+        // IF EXISTS, PUSH THE CHAT TO THE EXISTING ARRAY
+        await UserChat.updateOne(
+          { userId: userId },
+          {
+            $push: {
+              chats: {
+                _id: savedChat._id,
+                title: text.substring(0, 40),
+              },
+            },
+          }
+        );
+  
+        res.status(201).send(newChat._id);
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Error creating chat!");
     }
-})
+  });
+
+// 🛠 Global Error Handler
+app.use((err, req, res, next) => {
+    console.error("Global Error:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+});
+
 
 const PORT=process.env.PORT || 3000;
 app.listen(PORT,()=>{

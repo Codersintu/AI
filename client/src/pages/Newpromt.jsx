@@ -7,7 +7,7 @@ import Markdown from 'react-markdown'
 export function Newpromt(props) {
     const [question,setQuestion]=useState("");
     const [answer,setAnswer]=useState("");
-    const endRef=useRef(null)
+    // const endRef=useRef()
     const [img,setImg]=useState({
         isLoading:false,
         error:"",
@@ -27,9 +27,9 @@ export function Newpromt(props) {
           },
         ],
       });
-    useEffect(()=>{
-        endRef.current.scrollIntoView({behavior:"smooth"})
-    },[question,answer,img.dbData])
+    // useEffect(()=>{
+    //     endRef.current.scrollIntoView({behavior:"smooth"})
+    // },[question,answer,img.dbData])
     
     const add=async(text)=>{
         setQuestion(text)
@@ -62,6 +62,7 @@ export function Newpromt(props) {
    
     return (
         <>
+        
         {img.isLoading && <div className=''>Loading...</div>}
         {img.dbData?.filePath && (
            <IKImage
@@ -74,8 +75,8 @@ export function Newpromt(props) {
         )}
         {question && <div className='message from user'>{question}</div>}
         {answer && <div className='message from AI'><Markdown>{answer}</Markdown></div>}
-        <div className="!pb-[100px]" ref={endRef}></div>
-        <form onSubmit={handleSubmit} className="flex items-center justify-center border !py-2 gap-4 absolute bottom-4 w-[50%] bg-gray-700 p-3 rounded-xl">
+        {/* <div ref={endRef}></div> */}
+        <form onSubmit={handleSubmit} className="flex form items-center justify-center border !py-2 gap-4 absolute bottom-4 w-[60%] bg-gray-700 p-3 rounded-xl">
             <Upload setImg={setImg}/>
             <input type="file" name="file" id="file" multiple={false} hidden />
             <input
@@ -88,6 +89,7 @@ export function Newpromt(props) {
                 <img src="/arrow.png" className="w-[30px] h-[30px] bg-white rounded-full" alt="" />
             </button>
         </form>
+       
         </>
     );
 }
